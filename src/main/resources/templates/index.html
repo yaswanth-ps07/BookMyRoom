@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>BookMyRoom Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="/">BookMyRoom</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link active" href="/">Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="/rooms">Rooms</a></li>
+                <li class="nav-item"><a class="nav-link" href="/guests">Guests</a></li>
+                <li class="nav-item"><a class="nav-link" href="/bookings">Bookings</a></li>
+                <li class="nav-item"><a class="nav-link" href="/bookings/availability">Check Availability</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div class="page-header mb-4">
+        <h1 class="display-6 fw-bold">BookMyRoom</h1>
+        <p class="text-muted">Guest House Room Booking Management System</p>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="stat-card card-blue">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-title">Total Rooms</div>
+                    </div>
+                    <div class="stat-icon"><i class="bi bi-door-open"></i></div>
+                </div>
+                <div class="stat-value" th:text="${totalRooms}">0</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card card-green">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-title">Available Today</div>
+                    </div>
+                    <div class="stat-icon"><i class="bi bi-check-circle"></i></div>
+                </div>
+                <div class="stat-value" th:text="${availableToday}">0</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card card-purple">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-title">Total Guests</div>
+                    </div>
+                    <div class="stat-icon"><i class="bi bi-people"></i></div>
+                </div>
+                <div class="stat-value" th:text="${totalGuests}">0</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card card-orange">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-title">Active Bookings</div>
+                    </div>
+                    <div class="stat-icon"><i class="bi bi-calendar-check"></i></div>
+                </div>
+                <div class="stat-value" th:text="${activeBookings}">0</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card card-cyan">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-title">Completed Bookings</div>
+                    </div>
+                    <div class="stat-icon"><i class="bi bi-clipboard-check"></i></div>
+                </div>
+                <div class="stat-value" th:text="${completedBookings}">0</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card card-red">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-title">Cancelled Bookings</div>
+                    </div>
+                    <div class="stat-icon"><i class="bi bi-x-circle"></i></div>
+                </div>
+                <div class="stat-value" th:text="${cancelledBookings}">0</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="quick-actions mb-4">
+        <h4 class="section-title">Quick Actions</h4>
+        <div class="d-flex flex-wrap gap-3">
+            <a href="/rooms/add" class="btn btn-primary action-btn"><i class="bi bi-plus-circle"></i> Add Room</a>
+            <a href="/guests/add" class="btn btn-primary action-btn"><i class="bi bi-person-plus"></i> Add Guest</a>
+            <a href="/bookings/add" class="btn btn-primary action-btn"><i class="bi bi-calendar-plus"></i> New Booking</a>
+            <a href="/bookings/availability" class="btn btn-outline-light action-btn"><i class="bi bi-search"></i> Check Availability</a>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-7">
+            <div class="card dashboard-card h-100">
+                <div class="card-body">
+                    <h4 class="section-title">Recent Bookings</h4>
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover align-middle">
+                            <thead>
+                            <tr>
+                                <th>Booking ID</th>
+                                <th>Guest</th>
+                                <th>Room</th>
+                                <th>Check-In</th>
+                                <th>Check-Out</th>
+                                <th>Total Cost</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="booking : ${recentBookings}">
+                                <td th:text="${booking.id}">1</td>
+                                <td th:text="${booking.guest.name}">Guest</td>
+                                <td th:text="${booking.room.roomNumber}">101</td>
+                                <td th:text="${booking.checkInDate}">2026-01-01</td>
+                                <td th:text="${booking.checkOutDate}">2026-01-03</td>
+                                <td th:text="${'₹' + #numbers.formatDecimal(booking.totalCost, 1, 'COMMA', 2, 'POINT')}">₹0</td>
+                                <td>
+                                    <span class="badge status-confirmed" th:if="${booking.status == 'Confirmed'}">Confirmed</span>
+                                    <span class="badge status-cancelled" th:if="${booking.status == 'Cancelled'}">Cancelled</span>
+                                    <span class="badge status-completed" th:if="${booking.status == 'Completed'}">Completed</span>
+                                </td>
+                                <td>
+                                    <div class="action-group">
+                                        <a th:href="@{/bookings/view/{id}(id=${booking.id})}" class="btn btn-sm btn-outline-info">View</a>
+                                        <a th:if="${booking.status == 'Confirmed'}" th:href="@{/bookings/cancel/{id}(id=${booking.id})}" class="btn btn-sm btn-outline-warning">Cancel</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(recentBookings)}">
+                                <td colspan="8" class="text-center text-muted">No bookings found.</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card dashboard-card h-100">
+                <div class="card-body">
+                    <h4 class="section-title">Upcoming Check-ins</h4>
+                    <ul class="list-group list-group-flush compact-list">
+                        <li class="list-group-item bg-transparent text-light" th:each="booking : ${upcomingCheckIns}">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong th:text="${booking.guest.name}">Guest</strong>
+                                    <div class="small text-muted">Room <span th:text="${booking.room.roomNumber}">101</span></div>
+                                </div>
+                                <span class="badge status-confirmed" th:text="${booking.status}">Confirmed</span>
+                            </div>
+                            <div class="small text-muted mt-2">Check-in: <span th:text="${booking.checkInDate}">2026-01-01</span></div>
+                        </li>
+                        <li class="list-group-item bg-transparent text-light" th:if="${#lists.isEmpty(upcomingCheckIns)}">
+                            No upcoming check-ins.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="card dashboard-card h-100">
+                <div class="card-body">
+                    <h4 class="section-title">Today's Check-ins</h4>
+                    <ul class="list-group list-group-flush compact-list">
+                        <li class="list-group-item bg-transparent text-light" th:each="booking : ${todaysCheckIns}">
+                            <div class="d-flex justify-content-between">
+                                <span th:text="${booking.guest.name}">Guest</span>
+                                <span class="badge status-confirmed">Confirmed</span>
+                            </div>
+                            <div class="small text-muted">Room <span th:text="${booking.room.roomNumber}"></span> • <span th:text="${booking.checkInDate}"></span> to <span th:text="${booking.checkOutDate}"></span></div>
+                        </li>
+                        <li class="list-group-item bg-transparent text-light" th:if="${#lists.isEmpty(todaysCheckIns)}">No check-ins today.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card dashboard-card h-100">
+                <div class="card-body">
+                    <h4 class="section-title">Today's Check-outs</h4>
+                    <ul class="list-group list-group-flush compact-list">
+                        <li class="list-group-item bg-transparent text-light" th:each="booking : ${todaysCheckOuts}">
+                            <div class="d-flex justify-content-between">
+                                <span th:text="${booking.guest.name}">Guest</span>
+                                <span class="badge status-confirmed">Confirmed</span>
+                            </div>
+                            <div class="small text-muted">Room <span th:text="${booking.room.roomNumber}"></span> • <span th:text="${booking.checkInDate}"></span> to <span th:text="${booking.checkOutDate}"></span></div>
+                        </li>
+                        <li class="list-group-item bg-transparent text-light" th:if="${#lists.isEmpty(todaysCheckOuts)}">No check-outs today.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-7">
+            <div class="card dashboard-card h-100">
+                <div class="card-body">
+                    <h4 class="section-title">Room Status Overview</h4>
+                    <div class="room-status-grid">
+                        <div class="mini-stat">
+                            <span class="mini-label">Available Today</span>
+                            <strong th:text="${availableToday}">0</strong>
+                        </div>
+                        <div class="mini-stat">
+                            <span class="mini-label">Currently Occupied</span>
+                            <strong th:text="${currentlyOccupied}">0</strong>
+                        </div>
+                        <div class="mini-stat">
+                            <span class="mini-label">Maintenance</span>
+                            <strong th:text="${maintenanceRooms}">0</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card dashboard-card h-100">
+                <div class="card-body">
+                    <h4 class="section-title">Occupancy Summary</h4>
+                    <div class="occupancy-summary">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <strong th:text="${currentlyOccupied + ' / ' + totalRooms + ' Rooms Occupied'}">0 / 0 Rooms Occupied</strong>
+                        </div>
+                        <div class="progress custom-progress mb-2">
+                            <div class="progress-bar" role="progressbar" th:style="'width: ' + ${occupancyPercentage} + '%'" th:aria-valuenow="${occupancyPercentage}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <div class="text-muted">Occupancy Rate: <strong th:text="${#numbers.formatDecimal(occupancyPercentage, 1, 2) + '%'}">0%</strong></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
